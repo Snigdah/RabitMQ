@@ -10,7 +10,7 @@ public class InventoryConsumer {
 
     @RabbitListener(queues = INVENTORY_QUEUE)
     public void handleOrderEvents(OrderCreatedEvent event) {
-        System.out.println("📦 Inventory Service Received Event: " + event);
+        //System.out.println("📦 Inventory Service Received Event: " + event);
 
         // Business Logic (Example)
         System.out.println("✔ Decreasing stock for product: " + event.getProduct());
