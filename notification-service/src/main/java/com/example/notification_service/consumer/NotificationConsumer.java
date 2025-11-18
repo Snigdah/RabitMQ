@@ -20,7 +20,14 @@ public class NotificationConsumer {
         // Business Logic Example
         System.out.println("✔ Sending email to user: " + event.getUserId());
 
-        //Send Notification
-        messagingTemplate.convertAndSend("/topic/notifications", event);
+        //Send Notification BroadCast
+       // messagingTemplate.convertAndSend("/topic/notifications", event);
+
+        // Send ONLY to specific user
+        messagingTemplate.convertAndSendToUser(
+                event.getUserId(),              // userId
+                "/queue/notifications",         // frontend subscribes to /user/queue/notifications
+                event
+        );
     }
 }
