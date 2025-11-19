@@ -18,10 +18,7 @@ export default function Notifications() {
         return new WebSocket(`ws://localhost:8087/ws?userId=${userId}`);
       },
 
-      connectHeaders: {
-        userId: userId  // Also send in STOMP headers
-      },
-
+      
       onConnect: () => {
         console.log("✅ Connected as:", userId);
         setConnected(true);

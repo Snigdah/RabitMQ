@@ -15,7 +15,6 @@ public class NotificationConsumer {
 
     @RabbitListener(queues = "order.notification.queue")
     public void sendNotification(OrderCreatedEvent event) {
-        //System.out.println("📧 Notification Service Received Event: " + event);
 
         // Business Logic Example
         System.out.println("✔ Sending email to user: " + event.getUserId());

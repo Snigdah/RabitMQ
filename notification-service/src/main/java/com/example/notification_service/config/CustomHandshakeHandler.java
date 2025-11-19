@@ -1,10 +1,11 @@
 package com.example.notification_service.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import org.springframework.http.server.ServerHttpRequest;
-import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.Principal;
 import java.util.Map;
@@ -16,45 +17,36 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
                                       WebSocketHandler wsHandler,
                                       Map<String, Object> attributes) {
 
-        String userId = null;
+        // Extract userId from query parameters
+        String userId = extractUserIdFromQuery(request);
 
-        // Extract userId from query parameter
-        if (request instanceof ServletServerHttpRequest) {
-            ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
-            userId = servletRequest.getServletRequest().getParameter("userId");
+        if (userId != null) {
+            System.out.println("✅ Handshake - User authenticated: " + userId);
+            return new StompPrincipal(userId);
         }
 
-        // Fallback: parse URI manually
-        if (userId == null || userId.trim().isEmpty()) {
-            userId = UriComponentsBuilder.fromUri(request.getURI())
-                    .build()
-                    .getQueryParams()
-                    .getFirst("userId");
-        }
+        // Fallback for anonymous users
+        String anonymousUser = "anonymous-" + System.currentTimeMillis();
+        System.out.println("⚠️ Handshake - Anonymous user: " + anonymousUser);
+        return new StompPrincipal(anonymousUser);
+    }
 
-        // Fallback: check headers
-        if (userId == null || userId.trim().isEmpty()) {
-            userId = request.getHeaders().getFirst("userId");
-        }
-
-        if (userId == null || userId.trim().isEmpty()) {
-            System.err.println("❌ No userId found in request");
-            userId = "anonymous-" + System.currentTimeMillis();
-        }
-
-        final String finalUserId = userId.trim();
-        System.out.println("✅ WebSocket Principal created for user: " + finalUserId);
-
-        return new Principal() {
-            @Override
-            public String getName() {
-                return finalUserId;
+    private String extractUserIdFromQuery(ServerHttpRequest request) {
+        String query = request.getURI().getQuery();
+        if (query != null) {
+            for (String param : query.split("&")) {
+                if (param.startsWith("userId=")) {
+                    return param.substring(7);
+                }
             }
+        }
+        return null;
+    }
 
-            @Override
-            public String toString() {
-                return finalUserId;
-            }
-        };
+    @Getter
+    @ToString
+    @AllArgsConstructor
+    public static class StompPrincipal implements Principal {
+        private final String name;
     }
 }
