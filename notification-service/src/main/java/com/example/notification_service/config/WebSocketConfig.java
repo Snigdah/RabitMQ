@@ -14,8 +14,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*") // React allowed
-                .setHandshakeHandler(new CustomHandshakeHandler()); // map user
+                .setAllowedOriginPatterns("*");
     }
 
     @Override
@@ -23,5 +22,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.enableSimpleBroker("/topic", "/queue"); // topic for broadcast, queue for user
         registry.setApplicationDestinationPrefixes("/app");
         registry.setUserDestinationPrefix("/user"); // <-- IMPORTANT for user-specific
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(new StompHeaderInterceptor());
     }
 }

@@ -5,27 +5,26 @@ export default function Notifications() {
   const [messages, setMessages] = useState([]);
   const [connected, setConnected] = useState(false);
 
-  const userId = "U2001"; // TODO: get from auth later
+  const userId = "U2001";
+  const authToken = "demo-token-123";
 
   useEffect(() => {
     const stompClient = new Client({
       brokerURL: `ws://localhost:8087/ws`,
       reconnectDelay: 5000,
 
-      // Use webSocketFactory to add custom headers
-      webSocketFactory: () => {
-        // Create WebSocket with user in URL
-        return new WebSocket(`ws://localhost:8087/ws?userId=${userId}`);
+      connectHeaders: {
+        'userId': userId,
+        'Authorization': `Bearer ${authToken}`
       },
 
-      
       onConnect: () => {
         console.log("✅ Connected as:", userId);
         setConnected(true);
 
-        // Subscribe to user-specific queue
+        // ✅ ONLY THIS SUBSCRIPTION IS NEEDED
         stompClient.subscribe("/user/queue/notifications", (msg) => {
-          console.log("📬 Received notification:", msg.body);
+          console.log("📬 Received user notification:", msg.body);
           const body = JSON.parse(msg.body);
           setMessages((prev) => [...prev, body]);
         });
@@ -33,7 +32,6 @@ export default function Notifications() {
 
       onStompError: (frame) => {
         console.error("❌ Broker error:", frame.headers["message"]);
-        console.error("Details:", frame.body);
         setConnected(false);
       },
 
@@ -48,13 +46,13 @@ export default function Notifications() {
     return () => {
       stompClient.deactivate();
     };
-  }, [userId]);
+  }, [userId, authToken]);
 
   return (
     <div style={{ padding: "20px" }}>
       <h2>Notifications for {userId}</h2>
       <p>Status: {connected ? "🟢 Connected" : "🔴 Disconnected"}</p>
-      
+
       {messages.length === 0 ? (
         <p>No notifications yet...</p>
       ) : (
