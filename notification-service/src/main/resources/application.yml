@@ -1,6 +1,23 @@
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jwt_security
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
   application:
     name: notification-service
+
   rabbitmq:
     host: localhost
     port: 5672
@@ -12,5 +29,6 @@ spring:
           enabled: true
           max-attempts: 5
           initial-interval: 1s
+
 server:
   port: 8087

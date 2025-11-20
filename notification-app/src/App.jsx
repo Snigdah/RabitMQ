@@ -15,7 +15,7 @@ export default function Notifications() {
 
       connectHeaders: {
         'userId': userId,
-        'Authorization': `Bearer ${authToken}`
+        'Authorization': `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huLmRvZUBleGFtcGxlLmNvbSIsImlhdCI6MTc2MzYyOTM5OSwiZXhwIjoxNzYzNjMwODM5fQ.eu6prQedvoDa4BWL2s-5z_TF2fVy-a2an1Q0q1U2ay0`
       },
 
       onConnect: () => {
